@@ -1,4 +1,4 @@
-# RetailMart Enterprise Analytics Platform
+# RetailMart-AI-Full-Stack-Enterprise-Analytics
 
 > A comprehensive, **AI-powered** analytics platform built with PostgreSQL, FastAPI, React (Vite), LangChain/LangGraph, and ChromaDB — featuring 25+ views, an AI chat agent with RAG, and a modern, dynamic interactive dashboard.
 
