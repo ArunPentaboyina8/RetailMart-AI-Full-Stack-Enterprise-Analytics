@@ -115,8 +115,8 @@ docker-compose.yml                     # Full-stack orchestration
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/retailmart-analytics.git
-   cd retailmart-analytics
+   git clone https://github.com/ArunPentaboyina8/RetailMart-AI-Full-Stack-Enterprise-Analytics.git
+   cd RetailMart-AI-Full-Stack-Enterprise-Analytics
    ```
 
 2. **Create the RetailMart database** (if not exists)
@@ -357,4 +357,3 @@ This project demonstrates mastery of:
 - ✅ Docker containerization with Docker Compose
 - ✅ CI/CD with GitHub Actions
 - ✅ Production deployment practices
-
