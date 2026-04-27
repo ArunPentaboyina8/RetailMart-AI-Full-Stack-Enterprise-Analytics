@@ -1,0 +1,142 @@
+# =============================================================================
+# RetailMart AI Analytics Platform - CI/CD Pipeline
+# =============================================================================
+# Runs on every push and PR to main branch.
+# Steps: Lint → Test → Build Docker → (Optional) Deploy
+# =============================================================================
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "20"
+
+jobs:
+  # --- Python Backend Lint & Test ---
+  backend-lint:
+    name: Backend Lint & Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install ruff pytest
+
+      - name: Lint with Ruff
+        run: |
+          ruff check . --select E,W,F,I --ignore E501
+          echo "✓ Linting passed"
+
+      - name: Check imports
+        run: |
+          python -c "from config import get_settings; print('✓ Config OK')"
+          python -c "from models import ChatRequest, ChatResponse; print('✓ Models OK')"
+          python -c "from ai.guardrails import SQLGuardrails; print('✓ Guardrails OK')"
+          python -c "from ai.prompts import SYSTEM_PROMPT; print('✓ Prompts OK')"
+
+      - name: Test SQL Guardrails
+        run: |
+          python -c "
+          from ai.guardrails import SQLGuardrails
+
+          # Should pass
+          ok, err = SQLGuardrails.validate('SELECT * FROM analytics.mv_executive_summary LIMIT 10')
+          assert ok, f'Valid query rejected: {err}'
+
+          # Should fail - DROP
+          ok, err = SQLGuardrails.validate('DROP TABLE users')
+          assert not ok, 'DROP query was not rejected!'
+
+          # Should fail - DELETE
+          ok, err = SQLGuardrails.validate('DELETE FROM sales.orders WHERE 1=1')
+          assert not ok, 'DELETE query was not rejected!'
+
+          # Should fail - SQL injection
+          ok, err = SQLGuardrails.validate(\"SELECT * FROM users WHERE name = '' OR '1'='1'\")
+          assert not ok, 'SQL injection was not rejected!'
+
+          print('✓ All guardrail tests passed')
+          "
+
+  # --- Docker Build Test ---
+  docker-build:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    needs: backend-lint
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: |
+          docker build -f Dockerfile.backend -t retailmart-backend:test ./backend
+          echo "✓ Docker image built successfully"
+
+      - name: Verify image
+        run: |
+          docker run --rm retailmart-backend:test python -c "
+          from config import get_settings
+          from ai.guardrails import SQLGuardrails
+          from ai.rag import KPI_KNOWLEDGE
+          print(f'✓ App loads OK, {len(KPI_KNOWLEDGE)} KPIs in knowledge base')
+          "
+
+  # --- Evaluation (on main branch only) ---
+  evaluation:
+    name: AI Evaluation
+    runs-on: ubuntu-latest
+    needs: backend-lint
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          pip install -r backend/requirements.txt
+
+      - name: Run knowledge base tests
+        working-directory: backend
+        run: |
+          python -c "
+          from ai.rag import load_knowledge_base, retrieve_context, KPI_KNOWLEDGE
+
+          # Test knowledge loading
+          count = load_knowledge_base()
+          assert count == len(KPI_KNOWLEDGE), f'Expected {len(KPI_KNOWLEDGE)}, got {count}'
+
+          # Test retrieval
+          results = retrieve_context('What is our total revenue?')
+          assert len(results) > 0, 'No results returned for revenue query'
+          assert any('revenue' in r.lower() for r in results), 'Revenue not in results'
+
+          results = retrieve_context('customer churn')
+          assert len(results) > 0, 'No results for churn query'
+
+          print(f'✓ Knowledge base tests passed ({count} docs, retrieval working)')
+          "
