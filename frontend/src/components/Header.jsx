@@ -22,9 +22,11 @@ export default function Header({ title }) {
         <div className="header-actions">
           <div className="header-status">
             <span className="status-dot" style={{
-              background: health?.status === 'healthy' ? 'var(--accent-green)' : 'var(--accent-orange)'
+              background: health?.status === 'healthy' ? 'var(--accent-green)'
+                : health?.database === 'demo_mode' ? 'var(--accent-blue, #60a5fa)' : 'var(--accent-orange)'
             }} />
-            <span>{health?.status === 'healthy' ? 'All systems online' : 'Connecting...'}</span>
+            <span>{health?.status === 'healthy' ? 'All systems online'
+              : health?.database === 'demo_mode' ? 'Demo Mode' : 'Connecting...'}</span>
           </div>
           <button className="header-badge" onClick={() => setShowAlerts(true)} id="alert-button">
             <HiOutlineBell />
