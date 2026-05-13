@@ -7,7 +7,6 @@ Embeds KPI definitions, schema context, and business rules
 so the LLM has accurate context when generating SQL.
 """
 
-import json
 import logging
 from pathlib import Path
 from typing import Optional

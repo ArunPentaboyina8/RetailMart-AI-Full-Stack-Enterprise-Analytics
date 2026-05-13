@@ -6,11 +6,10 @@ Tracks token usage, latency, costs, and error rates for AI operations.
 Implements cost optimization through semantic caching and budget enforcement.
 """
 
-import time
 import logging
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Optional
-from dataclasses import dataclass, field
 
 logger = logging.getLogger(__name__)
 

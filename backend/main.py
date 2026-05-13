@@ -10,24 +10,30 @@ Run with: uvicorn main:app --reload --port 8000
 
 import logging
 import time
-from datetime import datetime
 from contextlib import asynccontextmanager
+from datetime import datetime
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 
+from ai.agent import ask_analytics
+from ai.rag import get_knowledge_stats, is_knowledge_loaded, load_knowledge_base
 from config import get_settings
 from database import (
-    init_db_pool, close_db_pool, test_connection,
-    execute_query, execute_query_single,
+    close_db_pool,
+    execute_query,
+    execute_query_single,
+    init_db_pool,
+    test_connection,
 )
 from models import (
-    ChatRequest, ChatResponse, HealthResponse,
-    AlertsResponse, AlertItem, APIResponse,
+    AlertItem,
+    AlertsResponse,
+    APIResponse,
+    ChatRequest,
+    ChatResponse,
+    HealthResponse,
 )
-from ai.rag import load_knowledge_base, get_knowledge_stats, is_knowledge_loaded
-from ai.agent import ask_analytics
 from monitoring.tracker import AIUsageTracker
 
 # Configure logging
@@ -274,7 +280,7 @@ async def get_top_customers(limit: int = Query(20, ge=1, le=100)):
     """Get top customers by lifetime value."""
     try:
         data = execute_query(
-            """SELECT cust_id, full_name, city, state, clv_tier, total_orders, 
+            """SELECT cust_id, full_name, city, state, clv_tier, total_orders,
                       total_revenue, avg_order_value, days_since_last_order, customer_status
                FROM analytics.mv_customer_lifetime_value
                WHERE total_orders > 0
@@ -291,7 +297,7 @@ async def get_clv_tiers():
     """Get CLV tier distribution."""
     try:
         data = execute_query(
-            """SELECT clv_tier, COUNT(*) as customer_count, 
+            """SELECT clv_tier, COUNT(*) as customer_count,
                       ROUND(SUM(total_revenue)::NUMERIC, 2) as total_revenue,
                       ROUND(AVG(total_revenue)::NUMERIC, 2) as avg_revenue
                FROM analytics.mv_customer_lifetime_value

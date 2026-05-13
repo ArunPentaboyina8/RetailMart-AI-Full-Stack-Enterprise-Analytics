@@ -1,6 +1,7 @@
 """Quick test of all REST API endpoints against live database."""
-import httpx
 import json
+
+import httpx
 
 BASE = "http://localhost:8000"
 

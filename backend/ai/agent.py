@@ -6,28 +6,28 @@ Multi-step AI agent built with LangGraph for natural language analytics.
 Pipeline: Intent → Retrieve Context → Generate SQL → Validate → Execute → Synthesize Answer
 """
 
-import time
 import json
 import logging
-from typing import TypedDict, Optional, Annotated
+import time
+from typing import Optional, TypedDict
 
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.messages import SystemMessage, HumanMessage
-from langgraph.graph import StateGraph, END
+from langgraph.graph import END, StateGraph
 
-from config import get_settings
-from ai.prompts import (
-    SYSTEM_PROMPT,
-    SQL_GENERATION_PROMPT,
-    ANSWER_SYNTHESIS_PROMPT,
-    INTENT_CLASSIFICATION_PROMPT,
-    FEW_SHOT_EXAMPLES,
-)
-from ai.guardrails import validate_and_sanitize
-from ai.rag import retrieve_context
 from ai.fallback import FallbackChain
-from monitoring.tracker import AIUsageTracker
+from ai.guardrails import validate_and_sanitize
+from ai.prompts import (
+    ANSWER_SYNTHESIS_PROMPT,
+    FEW_SHOT_EXAMPLES,
+    INTENT_CLASSIFICATION_PROMPT,
+    SQL_GENERATION_PROMPT,
+    SYSTEM_PROMPT,
+)
+from ai.rag import retrieve_context
+from config import get_settings
 from database import execute_readonly_query
+from monitoring.tracker import AIUsageTracker
 
 logger = logging.getLogger(__name__)
 

@@ -8,6 +8,7 @@ Fallback chain: Primary Model → Smaller Model → Pre-computed Answers → Err
 
 import logging
 from typing import Optional
+
 from config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -77,8 +78,9 @@ class FallbackChain:
             return None
 
         try:
+            from langchain_core.messages import HumanMessage, SystemMessage
             from langchain_google_genai import ChatGoogleGenerativeAI
-            from langchain_core.messages import SystemMessage, HumanMessage
+
             from ai.prompts import SYSTEM_PROMPT
 
             llm = ChatGoogleGenerativeAI(

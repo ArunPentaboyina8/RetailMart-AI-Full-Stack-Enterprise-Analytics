@@ -6,12 +6,13 @@ PostgreSQL connection management using psycopg2 connection pool.
 Provides both sync (for FastAPI endpoints) and read-only (for AI agent) access.
 """
 
-import psycopg2
-from psycopg2 import pool, extras
-from contextlib import contextmanager
-from typing import Any, Optional
-from config import get_settings
 import logging
+from contextlib import contextmanager
+from typing import Optional
+
+from psycopg2 import extras, pool
+
+from config import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -102,8 +103,8 @@ def execute_readonly_query(query: str, params: tuple = None) -> list[dict]:
 def get_table_schema(schema_name: str = "analytics") -> list[dict]:
     """Get schema information for knowledge base embedding."""
     query = """
-        SELECT 
-            table_schema, table_name, column_name, 
+        SELECT
+            table_schema, table_name, column_name,
             data_type, is_nullable, column_default
         FROM information_schema.columns
         WHERE table_schema = %s
@@ -115,9 +116,9 @@ def get_table_schema(schema_name: str = "analytics") -> list[dict]:
 def get_kpi_metadata() -> list[dict]:
     """Get all KPI metadata for embedding into vector store."""
     query = """
-        SELECT 
+        SELECT
             kpi_name, kpi_category, kpi_type, object_name,
-            description, business_question, formula, 
+            description, business_question, formula,
             source_tables, refresh_frequency
         FROM analytics.kpi_metadata
         WHERE is_active = TRUE

@@ -142,7 +142,7 @@ LIMIT 5;"""
     },
     {
         "question": "Which categories have the highest return rates?",
-        "sql": """SELECT category, SUM(return_count) as total_returns, 
+        "sql": """SELECT category, SUM(return_count) as total_returns,
        ROUND(AVG(return_rate_pct)::NUMERIC, 2) as avg_return_rate
 FROM analytics.vw_return_analysis
 GROUP BY category
@@ -151,18 +151,18 @@ LIMIT 10;"""
     },
     {
         "question": "How many platinum customers are at risk of churning?",
-        "sql": """SELECT churn_risk_level, COUNT(*) as customer_count, 
+        "sql": """SELECT churn_risk_level, COUNT(*) as customer_count,
        ROUND(SUM(total_spent)::NUMERIC, 2) as total_value_at_risk
 FROM analytics.vw_churn_risk_customers
 WHERE clv_tier = 'Platinum'
 GROUP BY churn_risk_level
-ORDER BY CASE churn_risk_level 
-    WHEN 'Churned' THEN 1 WHEN 'High Risk' THEN 2 
+ORDER BY CASE churn_risk_level
+    WHEN 'Churned' THEN 1 WHEN 'High Risk' THEN 2
     WHEN 'Medium Risk' THEN 3 WHEN 'Low Risk' THEN 4 ELSE 5 END;"""
     },
     {
         "question": "What is our best performing store?",
-        "sql": """SELECT store_name, city, region, total_revenue, net_profit, 
+        "sql": """SELECT store_name, city, region, total_revenue, net_profit,
        profit_margin_pct, performance_tier, revenue_rank
 FROM analytics.mv_store_performance
 ORDER BY revenue_rank

@@ -6,8 +6,8 @@ Safety layer to validate AI-generated SQL queries before execution.
 Prevents SQL injection, destructive operations, and excessive queries.
 """
 
-import re
 import logging
+import re
 from typing import Optional
 
 logger = logging.getLogger(__name__)
@@ -146,7 +146,7 @@ class SQLGuardrails:
         for pattern in FORBIDDEN_PATTERNS:
             if re.search(pattern, sql, re.IGNORECASE | re.DOTALL):
                 raise SQLValidationError(
-                    f"Potentially unsafe SQL pattern detected. Query rejected for security.",
+                    "Potentially unsafe SQL pattern detected. Query rejected for security.",
                     "INJECTION_RISK"
                 )
 

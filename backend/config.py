@@ -6,9 +6,9 @@ Centralized configuration using Pydantic Settings.
 Reads from .env file and provides type-safe config access.
 """
 
-from pydantic_settings import BaseSettings
 from functools import lru_cache
-from typing import Optional
+
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
