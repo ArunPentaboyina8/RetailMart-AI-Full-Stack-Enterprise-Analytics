@@ -10,20 +10,23 @@ export default function Operations() {
   const [couriers, setCouriers] = useState(null);
 
   useEffect(() => {
-    getOpsSummary().then(r => setOps(r.data)).catch(() => {});
+    getOpsSummary().then(r => {
+      // ops summary may be a single object (not wrapped in data) or { data: {...} }
+      const d = r.data;
+      setOps(d);
+    }).catch(() => {});
     getCouriers().then(r => setCouriers(r.data)).catch(() => {});
   }, []);
 
   const courierChart = couriers ? {
     labels: couriers.map(c => c.courier_name || c.courier),
-    datasets: [{ label: 'On-Time %', data: couriers.map(c => c.on_time_pct || c.on_time || c.onTimePct) }],
+    datasets: [{ label: 'On-Time %', data: couriers.map(c => c.on_time_pct || c.onTimePct || c.on_time) }],
   } : null;
 
   const courierShipments = couriers ? {
     labels: couriers.map(c => c.courier_name || c.courier),
     datasets: [
-      { label: 'Delivered', data: couriers.map(c => c.delivered || c.delivered_orders) },
-      { label: 'In Transit', data: couriers.map(c => c.in_transit || c.pending_orders || c.shipments) },
+      { label: 'Shipments', data: couriers.map(c => c.shipments || c.delivered || c.delivered_orders) },
     ],
   } : null;
 

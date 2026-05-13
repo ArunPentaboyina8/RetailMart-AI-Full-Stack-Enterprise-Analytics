@@ -18,22 +18,22 @@ export default function Sales() {
 
   const dailyChart = daily ? {
     labels: daily.map(d => d.order_date || d.date),
-    datasets: [{ label: 'Daily Revenue', data: daily.map(d => d.daily_revenue || d.total_revenue) }],
+    datasets: [{ label: 'Daily Revenue', data: daily.map(d => d.daily_revenue || d.revenue || d.total_revenue) }],
   } : null;
 
   const dowChart = dow ? {
-    labels: dow.map(d => d.day_name),
-    datasets: [{ label: 'Total Revenue', data: dow.map(d => d.total_revenue) }],
+    labels: dow.map(d => d.day_name || d.dayName),
+    datasets: [{ label: 'Total Revenue', data: dow.map(d => d.total_revenue || d.revenue) }],
   } : null;
 
   const paymentChart = payment ? {
-    labels: payment.map(p => p.payment_mode || p.mode),
-    datasets: [{ data: payment.map(p => p.total_revenue || p.order_count) }],
+    labels: payment.map(p => p.payment_mode || p.paymentMode || p.mode),
+    datasets: [{ data: payment.map(p => p.total_revenue || p.amount || p.order_count) }],
   } : null;
 
   const qChart = quarterly ? {
-    labels: quarterly.map(q => q.quarter_label),
-    datasets: [{ label: 'Quarterly Revenue', data: quarterly.map(q => q.total_revenue) }],
+    labels: quarterly.map(q => q.quarter_label || q.quarterLabel),
+    datasets: [{ label: 'Quarterly Revenue', data: quarterly.map(q => q.total_revenue || q.revenue) }],
   } : null;
 
   return (

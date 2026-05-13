@@ -13,22 +13,26 @@ export default function Products() {
   useEffect(() => {
     getTopProducts(15).then(r => setProducts(r.data)).catch(() => { });
     getCategories().then(r => setCategories(r.data)).catch(() => { });
-    getABCAnalysis().then(r => setAbc(r.data)).catch(() => { });
+    getABCAnalysis().then(r => {
+      const d = r.data;
+      // ABC data may come as { summary: [...], topAProducts: [...] } or as array
+      setAbc(Array.isArray(d) ? d : d?.summary || []);
+    }).catch(() => { });
   }, []);
 
   const topChart = products ? {
-    labels: products.slice(0, 10).map(p => (p.prod_name || '').substring(0, 20)),
-    datasets: [{ label: 'Revenue', data: products.slice(0, 10).map(p => p.gross_revenue || p.net_revenue) }],
+    labels: products.slice(0, 10).map(p => (p.prod_name || p.productName || '').substring(0, 20)),
+    datasets: [{ label: 'Revenue', data: products.slice(0, 10).map(p => p.gross_revenue || p.net_revenue || p.revenue) }],
   } : null;
 
   const abcChart = abc ? {
-    labels: abc.map(a => `Class ${a.abc_classification}`),
-    datasets: [{ data: abc.map(a => a.product_count) }],
+    labels: abc.map(a => `Class ${a.abc_classification || a.class || a.classification}`),
+    datasets: [{ data: abc.map(a => a.product_count || a.productCount) }],
   } : null;
 
   const catChart = categories ? {
     labels: categories.map(c => c.category),
-    datasets: [{ label: 'Revenue', data: categories.map(c => c.net_revenue || c.gross_revenue) }],
+    datasets: [{ label: 'Revenue', data: categories.map(c => c.net_revenue || c.gross_revenue || c.revenue) }],
   } : null;
 
   return (
@@ -48,11 +52,11 @@ export default function Products() {
           title="📋 Product Details"
           columns={[
             { header: '#', key: '_idx', render: (_, __, i) => i + 1 },
-            { header: 'Product', key: 'prod_name' },
+            { header: 'Product', key: 'prod_name', render: (v, row) => v || row.productName },
             { header: 'Category', key: 'category' },
             { header: 'Brand', key: 'brand' },
-            { header: 'Revenue', key: 'gross_revenue', render: v => fmt(v) },
-            { header: 'Units', key: 'total_units_sold', render: v => fmtNum(v) },
+            { header: 'Revenue', key: 'gross_revenue', render: (v, row) => fmt(v || row.revenue) },
+            { header: 'Units', key: 'total_units_sold', render: (v, row) => fmtNum(v || row.unitsSold) },
           ]}
           rows={products}
         />

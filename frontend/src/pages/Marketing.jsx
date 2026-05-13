@@ -39,12 +39,11 @@ export default function Marketing() {
         <DataTable
           title="📋 Campaign Details"
           columns={[
-            { header: 'Campaign', key: 'campaign_name' },
-            { header: 'Duration', key: 'duration_days', render: v => `${v} days` },
+            { header: 'Campaign', key: 'campaign_name', render: (v, row) => v || row.campaignName },
             { header: 'Budget', key: 'budget', render: v => fmt(v) },
-            { header: 'Spend', key: 'actual_spend', render: v => fmt(v) },
-            { header: 'Clicks', key: 'total_clicks', render: v => fmtNum(v) },
-            { header: 'Conv %', key: 'conversion_rate_pct', render: v => fmtPct(v) },
+            { header: 'Spend', key: 'actual_spend', render: (v, row) => fmt(v || row.spend) },
+            { header: 'Clicks', key: 'total_clicks', render: (v, row) => fmtNum(v || row.clicks) },
+            { header: 'Conv %', key: 'conversion_rate_pct', render: (v, row) => fmtPct(v || row.conversionRate) },
           ]}
           rows={campaigns}
         />

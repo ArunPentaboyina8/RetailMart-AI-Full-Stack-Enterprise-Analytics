@@ -16,12 +16,12 @@ export default function Stores() {
 
   const regionalChart = regional ? {
     labels: regional.map(r => r.region),
-    datasets: [{ label: 'Revenue', data: regional.map(r => r.total_revenue) }],
+    datasets: [{ label: 'Revenue', data: regional.map(r => r.total_revenue || r.revenue) }],
   } : null;
 
   const storeChart = stores ? {
-    labels: stores.slice(0, 10).map(s => s.store_name || `Store ${s.store_id}`),
-    datasets: [{ label: 'Revenue', data: stores.slice(0, 10).map(s => s.total_revenue) }],
+    labels: stores.slice(0, 10).map(s => s.store_name || s.storeName || `Store ${s.store_id || s.storeId}`),
+    datasets: [{ label: 'Revenue', data: stores.slice(0, 10).map(s => s.total_revenue || s.revenue) }],
   } : null;
 
   return (
@@ -40,12 +40,15 @@ export default function Stores() {
           title="📊 Store Scorecard"
           columns={[
             { header: '#', key: '_idx', render: (_, __, i) => i + 1 },
-            { header: 'Store', key: 'store_name' },
+            { header: 'Store', key: 'store_name', render: (v, row) => v || row.storeName },
             { header: 'City', key: 'city' },
             { header: 'Region', key: 'region' },
-            { header: 'Revenue', key: 'total_revenue', render: v => fmt(v) },
-            { header: 'Profit', key: 'total_profit', render: v => fmt(v) },
-            { header: 'Margin', key: 'avg_profit_margin', render: v => v ? fmtPct(v) : '--' },
+            { header: 'Revenue', key: 'total_revenue', render: (v, row) => fmt(v || row.revenue) },
+            { header: 'Profit', key: 'total_profit', render: (v, row) => fmt(v || row.profit) },
+            { header: 'Margin', key: 'avg_profit_margin', render: (v, row) => {
+              const m = v || row.profitMargin;
+              return m ? fmtPct(m) : '--';
+            }},
           ]}
           rows={stores}
         />
