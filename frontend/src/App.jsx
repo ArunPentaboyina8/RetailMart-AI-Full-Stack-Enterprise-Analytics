@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import ChatWidget from './components/ChatWidget';
 import Executive from './pages/Executive';
@@ -11,7 +11,7 @@ import Marketing from './pages/Marketing';
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <div className="app-layout">
         <Sidebar />
         <main className="main-area">
@@ -27,6 +27,6 @@ export default function App() {
         </main>
         <ChatWidget />
       </div>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
