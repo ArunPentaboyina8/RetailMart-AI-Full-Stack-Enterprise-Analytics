@@ -172,11 +172,8 @@ export const getHealth = () =>
 // ── AI Chat ──
 export const sendChat = (question) =>
   API.post('/api/chat', { question, show_sql: true }).then(r => r.data).catch(() => ({
-    status: 'ok',
-    data: {
-      answer: '🔌 AI Chat requires a running backend. This is a static demo deployed on GitHub Pages — the charts and data you see are from pre-loaded analytics data.',
-      sql: null
-    }
+    answer: '🔌 AI Chat requires a running backend with the AI agent. This is a static demo — the charts and data you see are from pre-loaded analytics data.',
+    sql_query: null
   }));
 
 export default API;
